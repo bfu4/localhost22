@@ -16,6 +16,7 @@ func InitSql() {
 	structs.RegisterDriver("mysql", &mysql.MySQLDriver{})
 }
 
+// OpenDatabase open a given database
 func OpenDatabase(databaseUrl string, databaseName string, user string, password string) SqlDatabase {
 	creds := auth.Credentials{
 		Username: user,
@@ -30,6 +31,7 @@ func OpenDatabase(databaseUrl string, databaseName string, user string, password
 	}
 }
 
+// Login open a connection to the database with the specified credentials
 func (database SqlDatabase) Login(user string, password string) {
 	database.OpenConnection("mysql", user, password)
 }
