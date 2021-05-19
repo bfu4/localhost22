@@ -21,8 +21,8 @@ func RegisterDriver(name string, driver driver.Driver) {
 }
 
 func HasDriver(name string) bool {
-	for _, driver := range sql.Drivers() {
-		if driver == name {
+	for _, d := range sql.Drivers() {
+		if d == name {
 			return true
 		}
 	}

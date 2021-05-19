@@ -6,5 +6,6 @@ type File struct {
 	Name string
 	Size uint16
 	Type string
+	Extension string
 
 }
