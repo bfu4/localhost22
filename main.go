@@ -2,14 +2,19 @@ package main
 
 import (
 	"cdn/db"
+	. "cdn/router"
 	"cdn/util"
+	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
+	"net/http"
+	. "os"
 )
 
 func main() {
 	// This does not want to load unless we do it manually
 	_ = godotenv.Load(".env", ".env.example")
 	// host, _ := LookupEnv("CDN_HOST_ADDRESS")
+	sitePort, _ := LookupEnv("CDN_SITE_PORT")
 	// port, _ := LookupEnv("CDN_DATABASE_PORT")
 	// user, _ := LookupEnv("CDN_DATABASE_USER")
 	// pass, _ := LookupEnv("CDN_DATABASE_USER_PASSWORD")
@@ -17,6 +22,40 @@ func main() {
 
 	util.InitLogger("CDN")
 	db.InitSql()
+
+	router := Router{
+		Router:    chi.NewRouter(),
+	}
+
+	endpoint := Endpoint {
+		Name: "",
+		HostUrl: "localhost:3000",
+	}
+
+	obj1 := JsonObject{
+		Key:   "hello",
+		Value: "world",
+	}
+
+	obj2 := JsonObject{
+		Key:   "test",
+		Value: "object",
+	}
+
+	entire := Stringify(obj1, obj2)
+
+	router.Get(endpoint, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("content-type", "application/json")
+		w.WriteHeader(200)
+		_, _ = w.Write([]byte(entire))
+	})
+
+	util.Info("Starting server on port {}!", sitePort)
+	err := http.ListenAndServe(":" + sitePort, router)
+
+	if err != nil {
+		util.Fatal("Failed to start server on port {}! {}", sitePort, err.Error())
+	}
 
 	// database := db.OpenDatabase(
 	//	url,

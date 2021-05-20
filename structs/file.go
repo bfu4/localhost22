@@ -7,5 +7,6 @@ type File struct {
 	Size uint16
 	Type string
 	Extension string
+	Contents []byte
 
 }

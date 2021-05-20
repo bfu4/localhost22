@@ -19,7 +19,7 @@ func Upload(file structs.File, database db.SqlDatabase, site structs.Site) {
 func upload(file structs.File, newFileName RandomFileName, database db.SqlDatabase, site structs.Site) {
 	// do upload of the file contents, with the generated new name
 	// TODO: contents
-	doUpload(database, site, newFileName, nil)
+	doUpload(database, site, newFileName, file.Contents)
 }
 
 func doUpload(database db.SqlDatabase, site structs.Site, newFileName RandomFileName, contents []byte) {
