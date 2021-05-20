@@ -1,4 +1,4 @@
-package router
+package structs
 
 type Endpoint struct {
 

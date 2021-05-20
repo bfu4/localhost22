@@ -13,7 +13,7 @@ import (
 func main() {
 	// This does not want to load unless we do it manually
 	_ = godotenv.Load(".env", ".env.example")
-	// host, _ := LookupEnv("CDN_HOST_ADDRESS")
+	site, _ := LookupEnv("CDN_SITE_URL")
 	sitePort, _ := LookupEnv("CDN_SITE_PORT")
 	// port, _ := LookupEnv("CDN_DATABASE_PORT")
 	// user, _ := LookupEnv("CDN_DATABASE_USER")
@@ -27,28 +27,11 @@ func main() {
 		Router:    chi.NewRouter(),
 	}
 
-	endpoint := Endpoint {
-		Name: "",
-		HostUrl: "localhost:3000",
-	}
+	routes := GetRoutes(site)
 
-	obj1 := JsonObject{
-		Key:   "hello",
-		Value: "world",
-	}
+	root := routes[0]
 
-	obj2 := JsonObject{
-		Key:   "test",
-		Value: "object",
-	}
-
-	entire := Stringify(obj1, obj2)
-
-	router.Get(endpoint, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("content-type", "application/json")
-		w.WriteHeader(200)
-		_, _ = w.Write([]byte(entire))
-	})
+	router.Get(root.Endpoint, root.Callback)
 
 	util.Info("Starting server on port {}!", sitePort)
 	err := http.ListenAndServe(":" + sitePort, router)

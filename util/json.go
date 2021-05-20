@@ -1,6 +1,4 @@
-package router
-
-import "cdn/util"
+package util
 
 type JsonObject struct {
 
@@ -20,5 +18,5 @@ func Stringify(objects ...JsonObject) string {
 }
 
 func (json *JsonObject) Stringify() string {
-	return util.Format("\"{}\":\"{}\"", json.Key, json.Value)
+	return Format("\"{}\":\"{}\"", json.Key, json.Value)
 }
