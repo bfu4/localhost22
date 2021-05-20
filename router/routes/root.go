@@ -17,12 +17,12 @@ func Root(hostUrl string) structs.Route {
 		Callback: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("content-type", "application/json")
 			w.WriteHeader(200)
-			_, _ = w.Write(getData())
+			_, _ = w.Write(getRootData())
 		},
 	}
 }
 
-func getData() []byte {
+func getRootData() []byte {
 	helloWorld := util.JsonObject{
 		Key:   "hello",
 		Value: "world",

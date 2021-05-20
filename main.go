@@ -27,11 +27,7 @@ func main() {
 		Router:    chi.NewRouter(),
 	}
 
-	routes := GetRoutes(site)
-
-	root := routes[0]
-
-	router.Get(root.Endpoint, root.Callback)
+	SetupRoutes(router, site)
 
 	util.Info("Starting server on port {}!", sitePort)
 	err := http.ListenAndServe(":" + sitePort, router)
