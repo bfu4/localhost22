@@ -45,7 +45,7 @@ func main() {
 
 	db.SetGlobalDatabase(database)
 	// create a table
-	database.Query("create table if not exists uploaded (name VARCHAR(255), extension VARCHAR(255), site VARCHAR(255));")
+	database.Query("create table if not exists uploaded (original_name VARCHAR(255), name VARCHAR(255), extension VARCHAR(255), site VARCHAR(255));")
 	util.Info("Finished sql setup.")
 
 	// Start the server

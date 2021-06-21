@@ -26,6 +26,7 @@ func Content(hostUrl string) structs.Route {
 }
 
 type databaseEntry struct {
+	OriginalName string `json:"originalName"`
 	FileName      string `json:"name"`
 	FileExtension string `json:"ext"`
 	Site          string `json:"site"`
@@ -41,7 +42,7 @@ func getAllContent() string {
 	var curr string
 	for rows.Next() {
 		entry := databaseEntry{}
-		_ = rows.Scan(&entry.FileName, &entry.FileExtension, &entry.Site)
+		_ = rows.Scan(&entry.OriginalName, &entry.FileName, &entry.FileExtension, &entry.Site)
 		if curr != entry.Site {
 			curr = entry.Site
 		}

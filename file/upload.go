@@ -10,6 +10,7 @@ import (
 
 // RandomFile randomly generated file structure
 type RandomFile struct {
+	oldName string
 	name string
 	extension string
 }
@@ -21,8 +22,6 @@ func Upload(file structs.File, database db.SqlDatabase, site structs.Site) {
 
 // upload internal function to upload the file
 func upload(file structs.File, newFileName RandomFile, database db.SqlDatabase, site structs.Site) {
-	// do upload of the file contents, with the generated new name
-	// TODO: contents
 	doUpload(database, site, newFileName, file.Contents)
 }
 
@@ -33,7 +32,7 @@ func doUpload(database db.SqlDatabase, site structs.Site, newFileName RandomFile
 	if err != nil {
 		util.Info("Failed to create file [{}] because of {}!", fileName, err.Error())
 	} else {
-		queryValues := util.Format("(\"{}\", \"{}\", \"{}\");", newFileName.name, newFileName.extension, site.Name)
+		queryValues := util.Format("(\"{}\",\"{}\", \"{}\", \"{}\");", newFileName.oldName, newFileName.name, newFileName.extension, site.Name)
 		database.Query("insert into uploaded values" + queryValues)
 	}
 }
@@ -41,5 +40,5 @@ func doUpload(database db.SqlDatabase, site structs.Site, newFileName RandomFile
 // GenerateFileName generate an internal file name for the file to upload
 func GenerateFileName(file structs.File) RandomFile {
 	seq := randstr.Hex(8)
-	return RandomFile{seq, file.Extension}
+	return RandomFile{file.Name, seq, file.Extension}
 }
