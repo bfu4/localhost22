@@ -14,6 +14,7 @@ func Content(hostUrl string) structs.Route {
 		Name:    "/content",
 		HostUrl: hostUrl,
 	}
+
 	return structs.Route{
 		Endpoint: point,
 		Callback: func(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +27,7 @@ func Content(hostUrl string) structs.Route {
 }
 
 type databaseEntry struct {
-	OriginalName string `json:"originalName"`
+	OriginalName  string `json:"originalName"`
 	FileName      string `json:"name"`
 	FileExtension string `json:"ext"`
 	Site          string `json:"site"`
@@ -35,9 +36,11 @@ type databaseEntry struct {
 func getAllContent() string {
 	database := db.GetGlobalDatabase()
 	rows, err := database.DB.Query("select * from uploaded;")
+
 	if err != nil {
 		return util.Stringify(util.JsonObject{Key: "values", Value: "none"})
 	}
+
 	var sites = make(map[string][]databaseEntry)
 	var curr string
 	for rows.Next() {
@@ -51,7 +54,7 @@ func getAllContent() string {
 
 	ret, err := json.Marshal(sites)
 	if err != nil {
-		return util.Stringify(util.JsonObject{Key:"values", Value: "unreadable"})
+		return util.Stringify(util.JsonObject{Key: "values", Value: "unreadable"})
 	}
 	return string(ret)
 }
