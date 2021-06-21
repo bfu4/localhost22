@@ -3,6 +3,7 @@ package router
 import (
 	"cdn/router/routes"
 	"cdn/structs"
+	"os"
 )
 
 func GetRoutes(site structs.Site) []structs.Route {
@@ -15,6 +16,7 @@ func GetRoutes(site structs.Site) []structs.Route {
 
 func SetupRoutes(router Router, site structs.Site) {
 	_routes := GetRoutes(site)
+	_ = os.Mkdir(site.RelativeLocation + "/content", 0755)
 	for _, route := range _routes {
 		router.Handle(route.Endpoint, route.Callback)
 	}
