@@ -28,7 +28,6 @@ func upload(file structs.File, newFileName RandomFile, database db.SqlDatabase, 
 func doUpload(database db.SqlDatabase, site structs.Site, newFileName RandomFile, contents []byte) {
 	fileName := newFileName.name + newFileName.extension
 	// Write file
-	_ = os.Mkdir(site.RelativeLocation + "/content/", 0755)
 	err := os.WriteFile(util.Format("{}/content/{}", site.RelativeLocation, fileName), contents, 0755)
 	if err != nil {
 		util.Info("Failed to create file [{}] because of {}!", fileName, err.Error())
