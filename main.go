@@ -12,8 +12,7 @@ import (
 )
 
 func main() {
-	// This does not want to load unless we do it manually
-	_ = godotenv.Load(".env", ".env.example")
+	_ = godotenv.Load()
 	site, _ := LookupEnv("CDN_SITE_URL")
 	sitePort, _ := LookupEnv("CDN_SITE_PORT")
 	dbName, _ := LookupEnv("CDN_DATABASE")
