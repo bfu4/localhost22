@@ -14,6 +14,7 @@ func Content(hostUrl string) structs.Route {
 		Name:    "/content",
 		HostUrl: hostUrl,
 	}
+
 	return structs.Route{
 		Endpoint: point,
 		Callback: func(w http.ResponseWriter, r *http.Request) {
@@ -25,10 +26,10 @@ func Content(hostUrl string) structs.Route {
 	}
 }
 
-
 func getAllContent() string {
 	database := db.GetGlobalDatabase()
 	rows, err := database.DB.Query("select * from uploaded;")
+
 	if err != nil {
 		return util.Stringify(util.JsonObject{Key: "values", Value: "none"})
 	}
@@ -45,7 +46,7 @@ func getAllContent() string {
 
 	ret, err := json.Marshal(sites)
 	if err != nil {
-		return util.Stringify(util.JsonObject{Key:"values", Value: "unreadable"})
+		return util.Stringify(util.JsonObject{Key: "values", Value: "unreadable"})
 	}
 	return string(ret)
 }
