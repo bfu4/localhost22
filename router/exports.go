@@ -8,7 +8,9 @@ import (
 func GetRoutes(site structs.Site) []structs.Route {
 	root := routes.Root(site.Url)
 	upload := routes.Upload(site)
-	return []structs.Route{root, upload}
+	content := routes.Content(site.Url)
+	file := routes.File(site.Url)
+	return []structs.Route{root, upload, content, file}
 }
 
 func SetupRoutes(router Router, site structs.Site) {
