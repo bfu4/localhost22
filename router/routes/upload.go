@@ -9,7 +9,9 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"os"
 )
+
 
 // Upload the upload route
 // The entire procedure may be tested via curl using:
@@ -27,6 +29,18 @@ func Upload(site structs.Site) structs.Route {
 			// Check for post request
 			if r.Method != "POST" {
 				w.WriteHeader(405)
+				return
+			}
+
+			_ = r.ParseMultipartForm(32 << 20) // 32 MB, default
+
+			allowedUsername, _ := os.LookupEnv("ADMIN")
+			allowedPassword, _ := os.LookupEnv("ADMIN_PASSWORD")
+
+			if r.FormValue("user") != allowedUsername || r.PostForm.Get("password") != allowedPassword {
+				w.Header().Add("Content-Type", "application/json")
+				w.WriteHeader(400)
+				_, _ =w.Write([]byte(util.Stringify(util.JsonObject{Key: "error", Value: "invalid password"})))
 				return
 			}
 
