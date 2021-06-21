@@ -1,41 +1,68 @@
 package routes
 
 import (
+	"bytes"
+	"cdn/db"
+	cdnFile "cdn/file"
 	"cdn/structs"
 	"cdn/util"
+	"io"
+	"mime"
 	"net/http"
 )
 
 // Upload the upload route
-func Upload(hostUrl string) structs.Route {
+// The entire procedure may be tested via curl using:
+// `curl -i -F file=@"$FILE".png localhost:8080/upload -v`
+func Upload(site structs.Site) structs.Route {
 	point := structs.Endpoint{
 		Name:    "/upload",
-		HostUrl: hostUrl,
+		HostUrl: site.Url,
 	}
 	return structs.Route{
 		Endpoint: point,
 		Callback: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Add("Access-Control-Allow-Origin", "*")
+
+			// Check for post request
 			if r.Method != "POST" {
-				// Check
 				w.WriteHeader(405)
 				return
 			}
 
-			// Suppress
-			_ = r.ParseForm()
+			// Get the file from key `file`
+			file, handler, err := r.FormFile("file")
+			if err != nil {
+				util.Info(err.Error())
+				w.WriteHeader(400)
+				return
+			}
 
-			// Write
+			// Write the file into the byte buffer
+			bz := bytes.NewBuffer(nil)
+			_, err = io.Copy(bz, file)
+
+			// If it fails, return internal server error
+			if err != nil {
+				print(err.Error())
+				w.WriteHeader(500)
+				return
+			}
+			contentType := http.DetectContentType(bz.Bytes())
+			ext, _ := mime.ExtensionsByType(contentType)
+
+			uploadFile := structs.File{
+				Name:      handler.Filename,
+				Size:      uint16(bz.Len()),
+				Type:      contentType,
+				Extension: ext[0],
+				Contents:  bz.Bytes(),
+			}
+			// Write file into uploaded content folder
+			cdnFile.Upload(uploadFile, db.GetGlobalDatabase(), site)
 			w.WriteHeader(200)
-			_, _ = w.Write(getUploadData(r.Form.Get("data")))
+
+			defer file.Close()
 		},
 	}
-}
-
-// Todo actually do this
-func getUploadData(formData string) []byte {
-	data := util.JsonObject{
-		Key:   "posted",
-		Value: formData,
-	}
-	return []byte(util.Stringify(data))
 }

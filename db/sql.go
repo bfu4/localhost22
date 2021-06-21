@@ -7,13 +7,26 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+var database SqlDatabase
+
 // SqlDatabase type-alias the database locally for this file
 type SqlDatabase struct {
 	structs.Database
+	creds auth.Credentials
 }
 
 func InitSql() {
 	structs.RegisterDriver("mysql", &mysql.MySQLDriver{})
+}
+
+// SetGlobalDatabase set the global database
+func SetGlobalDatabase(db SqlDatabase) {
+	database = db
+}
+
+// GetGlobalDatabase get the global database
+func GetGlobalDatabase() SqlDatabase {
+	return database
 }
 
 // OpenDatabase open a given database
@@ -28,12 +41,13 @@ func OpenDatabase(databaseUrl string, databaseName string, user string, password
 			databaseName,
 			creds,
 		),
+		creds,
 	}
 }
 
 // Login open a connection to the database with the specified credentials
-func (database SqlDatabase) Login(user string, password string) {
-	database.OpenConnection("mysql", user, password)
+func (database SqlDatabase) Login(user string, password string) structs.Database {
+	return database.OpenConnection("mysql", user, password)
 }
 
 // Query make a query and get the scan
