@@ -11,7 +11,8 @@ func GetRoutes(site structs.Site) []structs.Route {
 	upload := routes.Upload(site)
 	content := routes.Content(site.Url)
 	file := routes.File(site.Url)
-	return []structs.Route{root, upload, content, file}
+	remove := routes.Remove(site)
+	return []structs.Route{root, upload, content, file, remove}
 }
 
 func SetupRoutes(router Router, site structs.Site) {

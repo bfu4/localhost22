@@ -25,12 +25,6 @@ func Content(hostUrl string) structs.Route {
 	}
 }
 
-type databaseEntry struct {
-	OriginalName string `json:"originalName"`
-	FileName      string `json:"name"`
-	FileExtension string `json:"ext"`
-	Site          string `json:"site"`
-}
 
 func getAllContent() string {
 	database := db.GetGlobalDatabase()
@@ -38,10 +32,10 @@ func getAllContent() string {
 	if err != nil {
 		return util.Stringify(util.JsonObject{Key: "values", Value: "none"})
 	}
-	var sites = make(map[string][]databaseEntry)
+	var sites = make(map[string][]structs.DatabaseEntry)
 	var curr string
 	for rows.Next() {
-		entry := databaseEntry{}
+		entry := structs.DatabaseEntry{}
 		_ = rows.Scan(&entry.OriginalName, &entry.FileName, &entry.FileExtension, &entry.Site)
 		if curr != entry.Site {
 			curr = entry.Site
