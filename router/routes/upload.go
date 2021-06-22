@@ -8,10 +8,10 @@ import (
 	"cdn/util"
 	"io"
 	"mime"
+	"mime/multipart"
 	"net/http"
 	"os"
 )
-
 
 // Upload the upload route
 // The entire procedure may be tested via curl using:
@@ -40,7 +40,7 @@ func Upload(site structs.Site) structs.Route {
 			if r.FormValue("user") != allowedUsername || r.PostForm.Get("password") != allowedPassword {
 				w.Header().Add("Content-Type", "application/json")
 				w.WriteHeader(400)
-				_, _ =w.Write([]byte(util.Stringify(util.JsonObject{Key: "error", Value: "invalid password"})))
+				_, _ = w.Write([]byte(util.Stringify(util.JsonObject{Key: "error", Value: "invalid password"})))
 				return
 			}
 
@@ -72,11 +72,19 @@ func Upload(site structs.Site) structs.Route {
 				Extension: ext[0],
 				Contents:  bz.Bytes(),
 			}
+
 			// Write file into uploaded content folder
-			cdnFile.Upload(uploadFile, db.GetGlobalDatabase(), site)
+			randomFile := cdnFile.Upload(uploadFile, db.GetGlobalDatabase(), site)
 			w.WriteHeader(200)
 
-			defer file.Close()
+			_, _ = w.Write([]byte(util.Stringify(util.JsonObject{
+				Key:   "file",
+				Value: randomFile.Name + ext[0],
+			})))
+
+			defer func(file multipart.File) {
+				_ = file.Close()
+			}(file)
 		},
 	}
 }

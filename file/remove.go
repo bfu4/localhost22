@@ -13,7 +13,7 @@ func Remove(fileName string, site structs.Site, database db.SqlDatabase) {
 }
 
 func doRemove(fileName string, site structs.Site, database db.SqlDatabase) {
-	retrieveQueryString := util.Format("select * from uploaded where name = '{}' and site = '{}';", fileName, site.Name)
+	retrieveQueryString := util.Format("select * from uploaded where Name = '{}' and site = '{}';", fileName, site.Name)
 	rows := getRows(database.DB.Query(retrieveQueryString))
 	if rows != nil {
 		err := os.Remove(site.RelativeLocation + "/content/" + fileName + (*rows).FileExtension)
@@ -21,7 +21,7 @@ func doRemove(fileName string, site structs.Site, database db.SqlDatabase) {
 			util.Info("Failed to remove file {} from {}!", fileName, site.Name)
 			return
 		}
-		queryString := util.Format("delete from uploaded where name = '{}' and site = '{}';", fileName, site.Name)
+		queryString := util.Format("delete from uploaded where Name = '{}' and site = '{}';", fileName, site.Name)
 		database.Query(queryString)
 	}
 }

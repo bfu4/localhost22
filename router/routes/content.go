@@ -33,14 +33,18 @@ func getAllContent() string {
 	if err != nil {
 		return util.Stringify(util.JsonObject{Key: "values", Value: "none"})
 	}
+
 	var sites = make(map[string][]structs.DatabaseEntry)
 	var curr string
+
 	for rows.Next() {
 		entry := structs.DatabaseEntry{}
 		_ = rows.Scan(&entry.OriginalName, &entry.FileName, &entry.FileExtension, &entry.Site)
+
 		if curr != entry.Site {
 			curr = entry.Site
 		}
+
 		sites[curr] = append(sites[curr], entry)
 	}
 

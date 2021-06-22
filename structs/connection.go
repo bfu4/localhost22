@@ -2,9 +2,7 @@ package structs
 
 // Connection defines a simple connection
 type Connection struct {
-
-	Host string
+	Host     string
 	Endpoint string
-	Alive bool
-
+	Alive    bool
 }
