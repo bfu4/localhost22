@@ -32,10 +32,12 @@ func HasDriver(name string) bool {
 // OpenDatabase Open a database
 func OpenDatabase(protocol string, databaseUrl string, databaseName string) Database {
 	db, err := sql.Open(protocol, databaseUrl+"/"+databaseName)
+
 	// Fail immediately.
 	if err != nil {
 		Fatal("Failed because of {}!", err.Error())
 	}
+
 	return Database{db, databaseUrl, databaseName}
 }
 

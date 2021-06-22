@@ -58,7 +58,7 @@ func (database SqlDatabase) Query(query string) int {
 		return 0
 	} else {
 		var count int
-		rows.Scan(&count)
+		_ = rows.Scan(&count)
 		// Log
 		util.Info(
 			"Successfully executed statement for [{}]! Found {} matches.",
