@@ -2,11 +2,9 @@ package structs
 
 // File defines a base for a file
 type File struct {
-
-	Name string
-	Size uint16
-	Type string
+	Name      string
+	Size      uint16
+	Type      string
 	Extension string
-	Contents []byte
-
+	Contents  []byte
 }

@@ -1,9 +1,7 @@
 package structs
 
 type Site struct {
-
-	Name string
+	Name             string
 	RelativeLocation string
-	Url string
-
+	Url              string
 }

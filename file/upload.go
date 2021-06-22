@@ -18,13 +18,8 @@ type RandomFile struct {
 // Upload upload a file to a database
 func Upload(file structs.File, database db.SqlDatabase, site structs.Site) RandomFile {
 	name := GenerateFileName(file)
-	upload(file, name, database, site)
+	doUpload(database, site, name, file.Contents)
 	return name
-}
-
-// upload internal function to upload the file
-func upload(file structs.File, newFileName RandomFile, database db.SqlDatabase, site structs.Site) {
-	doUpload(database, site, newFileName, file.Contents)
 }
 
 func doUpload(database db.SqlDatabase, site structs.Site, newFileName RandomFile, contents []byte) {
