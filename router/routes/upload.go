@@ -7,16 +7,16 @@ import (
 	"cdn/structs"
 	"cdn/util"
 	"io"
-	"mime"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strings"
 )
 
 // Upload the upload route
 // The entire procedure may be tested via curl using:
 // `curl -i -F file=@"$FILE" -F site=site -F user=user -Fpassword=password localhost:8080/upload -v`
-func Upload(site structs.Site) structs.Route {
+func Upload(site structs.Site)	 structs.Route {
 	point := structs.Endpoint{
 		Name:    "/upload",
 		HostUrl: site.Url,
@@ -63,13 +63,13 @@ func Upload(site structs.Site) structs.Route {
 				return
 			}
 			contentType := http.DetectContentType(bz.Bytes())
-			ext, _ := mime.ExtensionsByType(contentType)
+			extension := "." + strings.Split(handler.Filename, ".")[1]
 
 			uploadFile := structs.File{
 				Name:      handler.Filename,
 				Size:      uint16(bz.Len()),
 				Type:      contentType,
-				Extension: ext[0],
+				Extension: extension,
 				Contents:  bz.Bytes(),
 			}
 
@@ -79,7 +79,7 @@ func Upload(site structs.Site) structs.Route {
 
 			_, _ = w.Write([]byte(util.Stringify(util.JsonObject{
 				Key:   "file",
-				Value: randomFile.Name + ext[0],
+				Value: randomFile.Name + extension,
 			})))
 
 			defer func(file multipart.File) {
