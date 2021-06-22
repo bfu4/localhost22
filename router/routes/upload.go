@@ -64,12 +64,13 @@ func Upload(site structs.Site)	 structs.Route {
 			}
 			contentType := http.DetectContentType(bz.Bytes())
 			split := strings.Split(handler.Filename, ".")
+			splitLen := len(split)
 			var extension string
 			// Make sure there is not a failure for files absent of extensions
-			if len(split) == 1 {
+			if splitLen == 1 {
 				extension = " "
 			} else {
-				extension = "." + split[len(split) - 1]
+				extension = "." + split[splitLen - 1]
 			}
 			uploadFile := structs.File{
 				Name:      handler.Filename,
