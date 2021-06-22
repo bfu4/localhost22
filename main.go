@@ -9,6 +9,8 @@ import (
 	"github.com/joho/godotenv"
 	"net/http"
 	. "os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -50,14 +52,14 @@ func main() {
 
 	// Start the server
 	util.Info("Starting server on port {}!", sitePort)
-	err := http.ListenAndServe(":"+sitePort, router)
+	err := http.ListenAndServe(":" + sitePort, router)
 
 	if err != nil {
 		util.Fatal("Failed to start server on port {}! {}", sitePort, err.Error())
 	}
 
 	// Do not close program
-	// sc := make(chan Signal, 1)
-	// signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, Interrupt, Kill)
-	// <- sc
+	sc := make(chan Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, Interrupt, Kill)
+	<- sc
 }

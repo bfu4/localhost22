@@ -31,7 +31,7 @@ func GetGlobalDatabase() SqlDatabase {
 
 // OpenDatabase open a given database
 func OpenDatabase(databaseUrl string, databaseName string, user string, password string) SqlDatabase {
-	creds := auth.Credentials{
+	credentials := auth.Credentials{
 		Username: user,
 		Password: password,
 	}
@@ -39,15 +39,15 @@ func OpenDatabase(databaseUrl string, databaseName string, user string, password
 		structs.OpenDatabaseWithCredentials(
 			"mysql", databaseUrl,
 			databaseName,
-			creds,
+			credentials,
 		),
-		creds,
+		credentials,
 	}
 }
 
 // Login open a connection to the database with the specified credentials
-func (database SqlDatabase) Login(user string, password string) structs.Database {
-	return database.OpenConnection("mysql", user, password)
+func (database SqlDatabase) Login(credentials auth.Credentials) structs.Database {
+	return database.OpenConnection("mysql", credentials)
 }
 
 // Query make a query and get the scan
