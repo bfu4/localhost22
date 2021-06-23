@@ -16,11 +16,12 @@ import (
 // Upload the upload route
 // The entire procedure may be tested via curl using:
 // `curl -i -F file=@"$FILE" -F site=site -F user=user -Fpassword=password localhost:8080/upload -v`
-func Upload(site structs.Site)	 structs.Route {
+func Upload(site structs.Site) structs.Route {
 	point := structs.Endpoint{
 		Name:    "/upload",
 		HostUrl: site.Url,
 	}
+
 	return structs.Route{
 		Endpoint: point,
 		Callback: func(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +38,7 @@ func Upload(site structs.Site)	 structs.Route {
 			allowedUsername, _ := os.LookupEnv("ADMIN")
 			allowedPassword, _ := os.LookupEnv("ADMIN_PASSWORD")
 
+			// Get the file from key `file`
 			if r.FormValue("user") != allowedUsername || r.PostForm.Get("password") != allowedPassword {
 				w.Header().Add("Content-Type", "application/json")
 				w.WriteHeader(400)
@@ -44,7 +46,6 @@ func Upload(site structs.Site)	 structs.Route {
 				return
 			}
 
-			// Get the file from key `file`
 			file, handler, err := r.FormFile("file")
 			if err != nil {
 				util.Info(err.Error())
@@ -62,15 +63,19 @@ func Upload(site structs.Site)	 structs.Route {
 				w.WriteHeader(500)
 				return
 			}
+
 			contentType := http.DetectContentType(bz.Bytes())
 			split := strings.Split(handler.Filename, ".")
+
 			var extension string
+
 			// Make sure there is not a failure for files absent of extensions
 			if len(split) == 1 {
 				extension = " "
 			} else {
-				extension = "." + split[len(split) - 1]
+				extension = "." + split[len(split)-1]
 			}
+
 			uploadFile := structs.File{
 				Name:      handler.Filename,
 				Size:      uint16(bz.Len()),

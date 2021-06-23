@@ -30,7 +30,7 @@ func getRootData() []byte {
 	}
 
 	testObject := util.JsonObject{
-		Key:   "test",
+		Key:   "gtest",
 		Value: "object",
 	}
 

@@ -3,6 +3,8 @@ package router
 import (
 	"cdn/router/routes"
 	"cdn/structs"
+	"github.com/dgrijalva/jwt-go"
+	"net/http"
 	"os"
 )
 
@@ -17,8 +19,19 @@ func GetRoutes(site structs.Site) []structs.Route {
 
 func SetupRoutes(router Router, site structs.Site) {
 	_routes := GetRoutes(site)
-	_ = os.Mkdir(site.RelativeLocation + "/content", 0755)
+	_ = os.Mkdir(site.RelativeLocation+"/content", 0755)
+
 	for _, route := range _routes {
-		router.Handle(route.Endpoint, route.Callback)
+		router.Handle(route.Endpoint, func(writer http.ResponseWriter, request *http.Request) {
+			if route.Authenticated {
+				auth := request.Header.Get("Authorization")
+
+				jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
+					token.Valid
+				})
+			}
+
+			route.Callback(writer, request)
+		})
 	}
 }
