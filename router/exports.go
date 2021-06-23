@@ -22,7 +22,7 @@ func GetRoutes(site structs.Site) []structs.Route {
 func SetupRoutes(router Router, site structs.Site) {
 	_routes := GetRoutes(site)
 
-	siteDirectory := site.RelativeLocation+"/content"
+	siteDirectory := site.RelativeLocation + "/content"
 	_, err := os.Stat(siteDirectory)
 
 	if os.IsNotExist(err) {
@@ -40,6 +40,12 @@ func SetupRoutes(router Router, site structs.Site) {
 	}
 
 	for _, route := range _routes {
+
+		// note from Ali – Learning golang
+		// https://hackernoon.com/dont-make-these-5-golang-mistakes-3l3x3wcw
+		// 1.1 Using reference to loop iterator variable
+		route := route
+
 		router.Handle(route.Endpoint, func(writer http.ResponseWriter, request *http.Request) {
 			if route.Authenticated {
 				auth := request.Header.Get("Authorization")
