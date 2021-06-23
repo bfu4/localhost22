@@ -19,6 +19,7 @@ type RandomFile struct {
 func Upload(file structs.File, database db.SqlDatabase, site structs.Site) RandomFile {
 	name := GenerateFileName(file)
 	doUpload(database, site, name, file.Contents)
+
 	return name
 }
 

@@ -53,18 +53,21 @@ func (database SqlDatabase) Login(credentials auth.Credentials) structs.Database
 // Query make a query and get the scan
 func (database SqlDatabase) Query(query string) int {
 	rows, err := database.DB.Query(query)
+
 	if err != nil {
 		util.Info("Query errored because of {}!", err.Error())
 		return 0
 	} else {
 		var count int
 		_ = rows.Scan(&count)
+
 		// Log
 		util.Info(
 			"Successfully executed statement for [{}]! Found {} matches.",
 			query,
 			string(rune(count)),
 		)
+
 		return count
 	}
 }

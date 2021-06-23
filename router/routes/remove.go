@@ -17,6 +17,7 @@ func Remove(site structs.Site) structs.Route {
 		Name:    "/remove",
 		HostUrl: site.Url,
 	}
+
 	return structs.Route{
 		Endpoint: point,
 		Callback: func(w http.ResponseWriter, r *http.Request) {

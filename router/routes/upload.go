@@ -9,20 +9,21 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"strings"
 )
 
 // Upload the upload route
 // The entire procedure may be tested via curl using:
 // `curl -i -F file=@"$FILE" -F site=site -F user=user -Fpassword=password localhost:8080/upload -v`
-func Upload(site structs.Site)	 structs.Route {
+func Upload(site structs.Site) structs.Route {
 	point := structs.Endpoint{
 		Name:    "/upload",
 		HostUrl: site.Url,
 	}
+
 	return structs.Route{
-		Endpoint: point,
+		Endpoint:      point,
+		Authenticated: true,
 		Callback: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("Access-Control-Allow-Origin", "*")
 
@@ -34,17 +35,6 @@ func Upload(site structs.Site)	 structs.Route {
 
 			_ = r.ParseMultipartForm(32 << 20) // 32 MB, default
 
-			allowedUsername, _ := os.LookupEnv("ADMIN")
-			allowedPassword, _ := os.LookupEnv("ADMIN_PASSWORD")
-
-			if r.FormValue("user") != allowedUsername || r.PostForm.Get("password") != allowedPassword {
-				w.Header().Add("Content-Type", "application/json")
-				w.WriteHeader(400)
-				_, _ = w.Write([]byte(util.Stringify(util.JsonObject{Key: "error", Value: "invalid password"})))
-				return
-			}
-
-			// Get the file from key `file`
 			file, handler, err := r.FormFile("file")
 			if err != nil {
 				util.Info(err.Error())
@@ -62,16 +52,19 @@ func Upload(site structs.Site)	 structs.Route {
 				w.WriteHeader(500)
 				return
 			}
+
 			contentType := http.DetectContentType(bz.Bytes())
 			split := strings.Split(handler.Filename, ".")
 			splitLen := len(split)
 			var extension string
+
 			// Make sure there is not a failure for files absent of extensions
 			if splitLen == 1 {
 				extension = " "
 			} else {
-				extension = "." + split[splitLen - 1]
+				extension = "." + split[splitLen-1]
 			}
+
 			uploadFile := structs.File{
 				Name:      handler.Filename,
 				Size:      uint16(bz.Len()),

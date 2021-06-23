@@ -17,6 +17,11 @@ func Fatal(message string, v ...string) {
 	log.Fatal(Format(fmt, v...))
 }
 
+func Warn(message string, v ...string) {
+	fmt := Format("\033[1;31mWARN: {}\033[0m", message)
+	log.Println(Format(fmt, v...))
+}
+
 // Info log an informative message
 func Info(message string, v ...string) {
 	log.Println(Format(message, v...))
@@ -25,12 +30,13 @@ func Info(message string, v ...string) {
 // Format a string
 func Format(message string, v ...string) string {
 	iter := 0
+
 	for index, character := range message {
-		if index != len(message) && character == '{' && message[index + 1] == '}' {
-			iter ++
-			return message[:index] + v[iter - 1] + Format(message[index+2:], v[iter:]...)
+		if index != len(message) && character == '{' && message[index+1] == '}' {
+			iter++
+			return message[:index] + v[iter-1] + Format(message[index+2:], v[iter:]...)
 		}
 	}
+
 	return message
 }
-
