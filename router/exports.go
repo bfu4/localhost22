@@ -33,10 +33,10 @@ func SetupRoutes(router Router, site structs.Site) {
 		}
 	}
 
-	authorizationHeader, exists := os.LookupEnv("AUTHORIZATION")
+	jwtSecret, exists := os.LookupEnv("JWT_SECRET")
 
 	if !exists {
-		util.Fatal("No AUTHORIZATION environment variable found.")
+		util.Fatal("No JWT_SECRET environment variable found.")
 	}
 
 	for _, route := range _routes {
@@ -51,7 +51,7 @@ func SetupRoutes(router Router, site structs.Site) {
 				auth := request.Header.Get("Authorization")
 
 				token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
-					return []byte(authorizationHeader), nil
+					return []byte(jwtSecret), nil
 				})
 
 				if err != nil || !token.Valid {
