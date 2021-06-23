@@ -23,7 +23,8 @@ func Upload(site structs.Site) structs.Route {
 	}
 
 	return structs.Route{
-		Endpoint: point,
+		Endpoint:      point,
+		Authenticated: true,
 		Callback: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("Access-Control-Allow-Origin", "*")
 
@@ -41,7 +42,7 @@ func Upload(site structs.Site) structs.Route {
 			// Get the file from key `file`
 			if r.FormValue("user") != allowedUsername || r.PostForm.Get("password") != allowedPassword {
 				w.Header().Add("Content-Type", "application/json")
-				w.WriteHeader(400)
+				w.WriteHeader(403)
 				_, _ = w.Write([]byte(util.Stringify(util.JsonObject{Key: "error", Value: "invalid password"})))
 				return
 			}
