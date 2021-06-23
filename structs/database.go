@@ -14,12 +14,14 @@ type Database struct {
 	Name string
 }
 
+// RegisterDriver register a sql driver with the given name
 func RegisterDriver(name string, driver driver.Driver) {
 	if !HasDriver(name) {
 		sql.Register(name, driver)
 	}
 }
 
+// HasDriver check if a driver is registered
 func HasDriver(name string) bool {
 	for _, d := range sql.Drivers() {
 		if d == name {
@@ -41,6 +43,7 @@ func OpenDatabase(protocol string, databaseUrl string, databaseName string) Data
 	return Database{db, databaseUrl, databaseName}
 }
 
+// OpenDatabaseWithCredentials open a database with the specified credentials
 func OpenDatabaseWithCredentials(
 	protocol string,
 	databaseUrl string,
@@ -51,7 +54,8 @@ func OpenDatabaseWithCredentials(
 	return OpenDatabase(protocol, url, databaseName)
 }
 
-func (database Database) OpenConnection(protocol string, user string, password string) Database {
-	url := Format("{}:{}@tcp({})", user, password, database.Url)
+// OpenConnection open a connection from a database using the specified protocol and credentials
+func (database Database) OpenConnection(protocol string, credentials auth.Credentials) Database {
+	url := Format("{}:{}@tcp({})", credentials.Username, credentials.Password, database.Url)
 	return OpenDatabase(protocol, url, database.Name)
 }

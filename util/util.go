@@ -2,6 +2,7 @@ package util
 
 import "log"
 
+// InitLogger initialize a logger with the specified name
 func InitLogger(name string) {
 	// magenta [name]
 	const fmt = "\033[1;35m[{}]\u0020\u001B[0m"
@@ -10,7 +11,7 @@ func InitLogger(name string) {
 	Info("Set up logger with name [{}]!", name)
 }
 
-// Fatal log a fatal message and exit
+// Fatal log a fatal message and exit the program
 func Fatal(message string, v ...string) {
 	fmt := Format("\033[1;31mERROR: {}\033[0m", message)
 	log.Fatal(Format(fmt, v...))
