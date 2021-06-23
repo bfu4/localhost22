@@ -51,7 +51,7 @@ func SetupRoutes(router Router, site structs.Site) {
 				auth := request.Header.Get("Authorization")
 
 				token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
-					return authorizationHeader, nil
+					return []byte(authorizationHeader), nil
 				})
 
 				if err != nil || !token.Valid {
