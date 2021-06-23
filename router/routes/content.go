@@ -49,8 +49,10 @@ func getAllContent() string {
 	}
 
 	ret, err := json.Marshal(sites)
+
 	if err != nil {
 		return util.Stringify(util.JsonObject{Key: "values", Value: "unreadable"})
 	}
+
 	return string(ret)
 }
