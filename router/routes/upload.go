@@ -9,7 +9,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -35,17 +34,6 @@ func Upload(site structs.Site) structs.Route {
 			}
 
 			_ = r.ParseMultipartForm(32 << 20) // 32 MB, default
-
-			allowedUsername, _ := os.LookupEnv("ADMIN")
-			allowedPassword, _ := os.LookupEnv("ADMIN_PASSWORD")
-
-			// Get the file from key `file`
-			if r.FormValue("user") != allowedUsername || r.PostForm.Get("password") != allowedPassword {
-				w.Header().Add("Content-Type", "application/json")
-				w.WriteHeader(403)
-				_, _ = w.Write([]byte(util.Stringify(util.JsonObject{Key: "error", Value: "invalid password"})))
-				return
-			}
 
 			file, handler, err := r.FormFile("file")
 			if err != nil {
