@@ -14,7 +14,7 @@ import (
 
 // Upload the upload route
 // The entire procedure may be tested via curl using:
-// `curl -i -F file=@"$FILE" -F site=site -F user=user -Fpassword=password localhost:8080/upload -v`
+// `curl -i -F file=@"$FILE" -F site=site -H 'Authorization: jwtToken' localhost:8080/upload -v`
 func Upload(site structs.Site) structs.Route {
 	point := structs.Endpoint{
 		Name:    "/upload",
