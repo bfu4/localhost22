@@ -54,7 +54,7 @@ func main() {
 	// Start the server
 	util.Info("Starting server on port {}!", sitePort)
 
-	defer mainSite.Listen(router.Router)
+	mainSite.Listen(router.Router)
 
 	// Do not close program
 	sc := make(chan Signal, 1)

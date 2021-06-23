@@ -21,10 +21,15 @@ func GetRoutes(site structs.Site) []structs.Route {
 func SetupRoutes(router Router, site structs.Site) {
 	_routes := GetRoutes(site)
 
-	err := os.Mkdir(site.RelativeLocation+"/content", 0755)
+	siteDirectory := site.RelativeLocation+"/content"
+	_, err := os.Stat(siteDirectory)
 
-	if err != nil {
-		util.Warn("Could not create content directory {}!.", err.Error())
+	if os.IsNotExist(err) {
+		err = os.Mkdir(siteDirectory, 0755)
+
+		if err != nil {
+			util.Warn("Could not create content directory {}!.", err.Error())
+		}
 	}
 
 	authorizationHeader, exists := os.LookupEnv("AUTHORIZATION")
