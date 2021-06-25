@@ -62,7 +62,7 @@ func Login(site structs.Site) structs.Route {
 			}
 
 			encoded, err := argon2.VerifyEncoded([]byte(password), []byte(user.Password))
-			success := encoded && err != nil
+			success := encoded && (err == nil)
 
 			if !success {
 				functions.SendError("incorrect password", 403, w)

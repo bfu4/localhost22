@@ -10,11 +10,9 @@ type printableError struct {
 }
 
 func SendError(err string, code int, w http.ResponseWriter) {
-	headers := w.Header()
-	headers.Add("Content-Type", "application/json")
-	headers.Add("Status", string(rune(code)))
+	w.Header().Add("Content-Type", "application/json")
 
-	_ = headers.Write(w)
+	w.WriteHeader(code)
 
 	pe := printableError{Message: err}
 	data, _ := json.Marshal(pe)

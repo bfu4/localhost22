@@ -77,7 +77,7 @@ func SetupRoutes(router Router, site structs.Site) {
 				}
 			}
 
-			go route.Callback(writer, request)
+			route.Callback(writer, request)
 		})
 	}
 }
