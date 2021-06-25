@@ -7,5 +7,7 @@ require (
 	github.com/go-chi/chi v1.5.4
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/joho/godotenv v1.3.0
+	github.com/matthewhartstonge/argon2 v0.1.4
 	github.com/thanhpk/randstr v1.0.4
+	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e // indirect
 )

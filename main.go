@@ -32,7 +32,7 @@ func main() {
 	mainSite := structs.Site{
 		Name:             "cdn",
 		RelativeLocation: ".",
-		Port: sitePort,
+		Port:             sitePort,
 		Url:              site,
 	}
 
@@ -49,6 +49,8 @@ func main() {
 
 	// create a table
 	database.Query("create table if not exists uploaded (original_name VARCHAR(255), name VARCHAR(255), extension VARCHAR(255), site VARCHAR(255));")
+	database.Query("create table if not exists users (admin BOOLEAN, username VARCHAR(255), password VARCHAR(255));")
+
 	util.Info("Finished sql setup.")
 
 	// Start the server
@@ -59,5 +61,5 @@ func main() {
 	// Do not close program
 	sc := make(chan Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, Interrupt, Kill)
-	<- sc
+	<-sc
 }
