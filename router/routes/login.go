@@ -40,6 +40,7 @@ func Login(site structs.Site) structs.Route {
 			err = rows.Scan(&user.Password)
 
 			if err != nil {
+				// todo: (@alii) `functions.SendError(err, errCode, w)`
 				w.Write(
 					[]byte(util.Stringify(util.JsonObject{
 						Key:   "error",

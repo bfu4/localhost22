@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"cdn/db"
 	cdnFile "cdn/file"
+	"cdn/router/functions"
 	"cdn/structs"
 	"cdn/util"
 	"io"
@@ -37,8 +38,7 @@ func Upload(site structs.Site) structs.Route {
 
 			file, handler, err := r.FormFile("file")
 			if err != nil {
-				util.Info(err.Error())
-				w.WriteHeader(400)
+				functions.SendError(err.Error(), 400, w)
 				return
 			}
 
@@ -48,8 +48,7 @@ func Upload(site structs.Site) structs.Route {
 
 			// If it fails, return internal server error
 			if err != nil {
-				print(err.Error())
-				w.WriteHeader(500)
+				functions.SendError(err.Error(), 500, w)
 				return
 			}
 
