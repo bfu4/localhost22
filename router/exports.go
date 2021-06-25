@@ -55,6 +55,15 @@ func SetupRoutes(router Router, site structs.Site) {
 		route := route
 
 		router.Handle(route.Endpoint, func(writer http.ResponseWriter, request *http.Request) {
+			if len(route.Methods) > 0 {
+				allowed := util.Contains(route.Methods, request.Method)
+
+				if !allowed {
+					writer.WriteHeader(405)
+					return
+				}
+			}
+
 			if route.Authenticated {
 				auth := request.Header.Get("Authorization")
 

@@ -8,6 +8,8 @@ import (
 	"cdn/util"
 	"github.com/matthewhartstonge/argon2"
 	"net/http"
+	"strings"
+	"time"
 )
 
 func Login(site structs.Site) structs.Route {
@@ -19,11 +21,17 @@ func Login(site structs.Site) structs.Route {
 	return structs.Route{
 		Endpoint:      endpoint,
 		Authenticated: false,
+		Methods:       []string{"POST"},
 		Callback: func(w http.ResponseWriter, r *http.Request) {
 			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
 
 			username := r.FormValue("username")
 			password := r.FormValue("password")
+
+			if len(username) == 0 || len(password) == 0 {
+				functions.SendError("No username or password specified", 400, w)
+				return
+			}
 
 			database := db.GetGlobalDatabase()
 
@@ -33,19 +41,17 @@ func Login(site structs.Site) structs.Route {
 			)
 
 			if rows == nil {
-				var message string
-
-				if err == nil {
-					message = "Something went wrong"
-				} else {
-					message = err.Error()
-				}
-
+				message := util.ErrorOrMessage(err, "Something went wrong.")
 				functions.SendError(message, 500, w)
 				return
 			}
 
 			user := auth.Credentials{}
+
+			if !rows.Next() {
+				functions.SendError("No user found", 404, w)
+				return
+			}
 
 			err = rows.Scan(&user.Password)
 
@@ -61,6 +67,19 @@ func Login(site structs.Site) structs.Route {
 				functions.SendError("incorrect password", 403, w)
 				return
 			}
+
+			weekDuration, _ := time.ParseDuration("week")
+			week := time.Now().Add(weekDuration)
+
+			cookie := http.Cookie{
+				HttpOnly: true,
+				SameSite: http.SameSiteLaxMode,
+				Secure:   strings.Contains(site.Url, "localhost"),
+				Path:     "/",
+				Expires:  week,
+			}
+
+			w.Header().Set("Set-Cookie", cookie.String())
 
 			_, _ = w.Write([]byte("OK"))
 		},

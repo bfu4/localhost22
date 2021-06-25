@@ -25,14 +25,9 @@ func Upload(site structs.Site) structs.Route {
 	return structs.Route{
 		Endpoint:      point,
 		Authenticated: true,
+		Methods:       []string{"POST"},
 		Callback: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("Access-Control-Allow-Origin", "*")
-
-			// Check for post request
-			if r.Method != "POST" {
-				w.WriteHeader(405)
-				return
-			}
 
 			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
 

@@ -40,3 +40,21 @@ func Format(message string, v ...string) string {
 
 	return message
 }
+
+func ErrorOrMessage(err error, message string) string {
+	if err == nil {
+		return message
+	}
+
+	return err.Error()
+}
+
+func Contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
+}
