@@ -5,7 +5,6 @@ import (
 	"cdn/db"
 	"cdn/router/functions"
 	"cdn/structs"
-	"cdn/util"
 	"github.com/matthewhartstonge/argon2"
 	"net/http"
 )
@@ -26,13 +25,20 @@ func Login(site structs.Site) structs.Route {
 			database := db.GetGlobalDatabase()
 
 			rows, err := database.DB.Query(
-				"SELECT password FROM user WHERE username = ?",
+				"SELECT password FROM users WHERE username = ?",
 				username,
 			)
 
 			if rows == nil {
-				w.Write([]byte("lol"))
+				var message string
 
+				if err == nil {
+					message = "Something went wrong"
+				} else {
+					message = err.Error()
+				}
+
+				functions.SendError(message, 500, w)
 				return
 			}
 
@@ -41,14 +47,7 @@ func Login(site structs.Site) structs.Route {
 			err = rows.Scan(&user.Password)
 
 			if err != nil {
-				// todo: (@alii) `functions.SendError(err, errCode, w)`
-				w.Write(
-					[]byte(util.Stringify(util.JsonObject{
-						Key:   "error",
-						Value: err.Error(),
-					})),
-				)
-
+				functions.SendError(err.Error(), 500, w)
 				return
 			}
 
@@ -60,7 +59,7 @@ func Login(site structs.Site) structs.Route {
 				return
 			}
 
-			w.Write([]byte("cool"))
+			_, _ = w.Write([]byte("OK"))
 		},
 	}
 }

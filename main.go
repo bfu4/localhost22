@@ -48,8 +48,8 @@ func main() {
 	db.SetGlobalDatabase(database)
 
 	// create a table
-	database.Query("create table if not exists uploaded (original_name VARCHAR(255), name VARCHAR(255), extension VARCHAR(255), site VARCHAR(255));")
-	database.Query("create table if not exists users (admin BOOLEAN, username VARCHAR(255), password VARCHAR(255));")
+	database.Query("CREATE TABLE IF NOT EXISTS uploaded (original_name VARCHAR(255), name VARCHAR(255), extension VARCHAR(255), site VARCHAR(255));")
+	database.Query("CREATE TABLE IF NOT EXISTS users (admin BOOLEAN, username VARCHAR(255), password VARCHAR(255));")
 
 	util.Info("Finished sql setup.")
 
