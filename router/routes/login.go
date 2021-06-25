@@ -6,6 +6,7 @@ import (
 	"cdn/router/functions"
 	"cdn/structs"
 	"cdn/util"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/matthewhartstonge/argon2"
 	"net/http"
 	"strings"
@@ -36,7 +37,7 @@ func Login(site structs.Site) structs.Route {
 			database := db.GetGlobalDatabase()
 
 			rows, err := database.DB.Query(
-				"SELECT password FROM users WHERE username = ?",
+				"SELECT id, password FROM users WHERE username = ?",
 				username,
 			)
 
@@ -53,7 +54,7 @@ func Login(site structs.Site) structs.Route {
 				return
 			}
 
-			err = rows.Scan(&user.Password)
+			err = rows.Scan(&user.Id, &user.Password)
 
 			if err != nil {
 				functions.SendError(err.Error(), 500, w)
@@ -68,15 +69,25 @@ func Login(site structs.Site) structs.Route {
 				return
 			}
 
-			weekDuration, _ := time.ParseDuration("week")
-			week := time.Now().Add(weekDuration)
+			expirationTime := time.Now().Add(time.Hour * 24 * 7)
+
+			claims := structs.Claims{
+				StandardClaims: jwt.StandardClaims{
+					ExpiresAt: expirationTime.Unix(),
+				},
+				UserId: user.Id,
+			}
+
+			token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+			tokenString, _ := token.SigningString()
 
 			cookie := http.Cookie{
 				HttpOnly: true,
 				SameSite: http.SameSiteLaxMode,
 				Secure:   strings.Contains(site.Url, "localhost"),
 				Path:     "/",
-				Expires:  week,
+				Expires:  expirationTime,
+				Value:    tokenString,
 			}
 
 			w.Header().Set("Set-Cookie", cookie.String())
