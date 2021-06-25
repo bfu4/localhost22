@@ -62,7 +62,7 @@ func Login(site structs.Site) structs.Route {
 			}
 
 			encoded, err := argon2.VerifyEncoded([]byte(password), []byte(user.Password))
-			success := encoded && err != nil
+			success := encoded && (err == nil)
 
 			if !success {
 				functions.SendError("incorrect password", 403, w)
@@ -79,18 +79,24 @@ func Login(site structs.Site) structs.Route {
 			}
 
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-			tokenString, _ := token.SigningString()
+			tokenString, err := token.SignedString(util.GetJWTSecret())
+
+			if err != nil {
+				functions.SendError(err.Error(), 500, w)
+				return
+			}
 
 			cookie := http.Cookie{
 				HttpOnly: true,
 				SameSite: http.SameSiteLaxMode,
-				Secure:   strings.Contains(site.Url, "localhost"),
+				Secure:   !strings.Contains(site.Url, "localhost"),
 				Path:     "/",
 				Expires:  expirationTime,
 				Value:    tokenString,
+				Name:     "token",
 			}
 
-			w.Header().Set("Set-Cookie", cookie.String())
+			http.SetCookie(w, &cookie)
 
 			_, _ = w.Write([]byte("OK"))
 		},
