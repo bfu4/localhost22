@@ -3,6 +3,7 @@ package routes
 import (
 	"cdn/auth"
 	"cdn/db"
+	"cdn/router/functions"
 	"cdn/structs"
 	"cdn/util"
 	"github.com/matthewhartstonge/argon2"
@@ -55,13 +56,7 @@ func Login(site structs.Site) structs.Route {
 			success := encoded && err != nil
 
 			if !success {
-				_, _ = w.Write(
-					[]byte(util.Stringify(util.JsonObject{
-						Key:   "error",
-						Value: "incorrect password",
-					})),
-				)
-
+				functions.SendError("incorrect password", 403, w)
 				return
 			}
 
