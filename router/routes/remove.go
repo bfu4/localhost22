@@ -5,6 +5,7 @@ import (
 	cdnFile "cdn/file"
 	"cdn/router/functions"
 	"cdn/structs"
+	"cdn/util"
 	"net/http"
 	"os"
 )
@@ -29,7 +30,7 @@ func Remove(site structs.Site) structs.Route {
 				return
 			}
 
-			_ = r.ParseMultipartForm(32 << 20) // 32 MB, default
+			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
 
 			allowedUsername, _ := os.LookupEnv("ADMIN")
 			allowedPassword, _ := os.LookupEnv("ADMIN_PASSWORD")

@@ -5,6 +5,7 @@ import (
 	"cdn/db"
 	"cdn/router/functions"
 	"cdn/structs"
+	"cdn/util"
 	"github.com/matthewhartstonge/argon2"
 	"net/http"
 )
@@ -19,6 +20,8 @@ func Login(site structs.Site) structs.Route {
 		Endpoint:      endpoint,
 		Authenticated: false,
 		Callback: func(w http.ResponseWriter, r *http.Request) {
+			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
+
 			username := r.FormValue("username")
 			password := r.FormValue("password")
 

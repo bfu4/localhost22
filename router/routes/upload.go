@@ -34,7 +34,7 @@ func Upload(site structs.Site) structs.Route {
 				return
 			}
 
-			_ = r.ParseMultipartForm(32 << 20) // 32 MB, default
+			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
 
 			file, handler, err := r.FormFile("file")
 			if err != nil {
