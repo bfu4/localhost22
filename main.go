@@ -5,11 +5,12 @@ import (
 	. "cdn/router"
 	"cdn/structs"
 	"cdn/util"
-	"github.com/go-chi/chi"
-	"github.com/joho/godotenv"
 	. "os"
 	"os/signal"
 	"syscall"
+
+	"github.com/go-chi/chi"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 	dbName, _ := LookupEnv("CDN_DATABASE")
 	user, _ := LookupEnv("CDN_DATABASE_USER")
 	pass, _ := LookupEnv("CDN_DATABASE_USER_PASSWORD")
-	url, _ := LookupEnv("CDN_HOST_URL")
+	url, _ := LookupEnv("CDN_DATABASE_HOST")
 
 	util.InitLogger("CDN")
 	db.InitSql()

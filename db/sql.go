@@ -4,6 +4,7 @@ import (
 	"cdn/auth"
 	"cdn/structs"
 	"cdn/util"
+
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -35,6 +36,7 @@ func OpenDatabase(databaseUrl string, databaseName string, user string, password
 		Username: user,
 		Password: password,
 	}
+
 	return SqlDatabase{
 		structs.OpenDatabaseWithCredentials(
 			"mysql", databaseUrl,

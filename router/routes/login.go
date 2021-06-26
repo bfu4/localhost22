@@ -50,7 +50,7 @@ func Login(site structs.Site) structs.Route {
 			user := auth.Credentials{}
 
 			if !rows.Next() {
-				functions.SendError("No user found", 404, w)
+				functions.SendError("User not found", 404, w)
 				return
 			}
 
@@ -65,7 +65,7 @@ func Login(site structs.Site) structs.Route {
 			success := encoded && (err == nil)
 
 			if !success {
-				functions.SendError("incorrect password", 403, w)
+				functions.SendError("Incorrect password", 403, w)
 				return
 			}
 
