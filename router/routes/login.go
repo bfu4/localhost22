@@ -89,14 +89,14 @@ func Login(site structs.Site) structs.Route {
 			cookie := http.Cookie{
 				HttpOnly: true,
 				SameSite: http.SameSiteLaxMode,
-				Secure:   strings.Contains(site.Url, "localhost"),
+				Secure:   !strings.Contains(site.Url, "localhost"),
 				Path:     "/",
 				Expires:  expirationTime,
 				Value:    tokenString,
+				Name:     "token",
 			}
 
-			w.Header().Set("Set-Cookie", cookie.String())
-			_ = w.Header().Write(w)
+			http.SetCookie(w, &cookie)
 
 			_, _ = w.Write([]byte("OK"))
 		},
