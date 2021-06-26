@@ -2,7 +2,6 @@ package util
 
 import (
 	"errors"
-	"log"
 	"os"
 )
 
@@ -10,7 +9,8 @@ func GetEnvironment(key string) string {
 	value, exists := os.LookupEnv(key)
 
 	if !exists {
-		log.Fatalln(errors.New("No environment variable specified for " + key))
+		err := errors.New("No environment variable specified for " + key)
+		Fatal(err.Error())
 	}
 
 	return value
