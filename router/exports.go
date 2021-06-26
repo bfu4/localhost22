@@ -66,8 +66,6 @@ func SetupRoutes(router Router, site structs.Site) {
 					return
 				}
 
-				println(cookie.Value)
-
 				token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
 					return util.GetJWTSecret(), nil
 				})
