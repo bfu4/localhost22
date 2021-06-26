@@ -12,6 +12,7 @@ func Root(hostUrl string) structs.Route {
 		Name:    "/",
 		HostUrl: hostUrl,
 	}
+
 	return structs.Route{
 		Endpoint: point,
 		Callback: func(w http.ResponseWriter, r *http.Request) {

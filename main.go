@@ -14,10 +14,10 @@ import (
 
 func main() {
 	_ = godotenv.Load()
+
 	site, _ := LookupEnv("CDN_SITE_URL")
 	sitePort, _ := LookupEnv("CDN_SITE_PORT")
 	dbName, _ := LookupEnv("CDN_DATABASE")
-	// port, _ := LookupEnv("CDN_DATABASE_PORT")
 	user, _ := LookupEnv("CDN_DATABASE_USER")
 	pass, _ := LookupEnv("CDN_DATABASE_USER_PASSWORD")
 	url, _ := LookupEnv("CDN_HOST_URL")
@@ -32,7 +32,7 @@ func main() {
 	mainSite := structs.Site{
 		Name:             "cdn",
 		RelativeLocation: ".",
-		Port: sitePort,
+		Port:             sitePort,
 		Url:              site,
 	}
 
@@ -47,10 +47,6 @@ func main() {
 
 	db.SetGlobalDatabase(database)
 
-	// create a table
-	database.Query("create table if not exists uploaded (original_name VARCHAR(255), name VARCHAR(255), extension VARCHAR(255), site VARCHAR(255));")
-	util.Info("Finished sql setup.")
-
 	// Start the server
 	util.Info("Starting server on port {}!", sitePort)
 
@@ -59,5 +55,5 @@ func main() {
 	// Do not close program
 	sc := make(chan Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, Interrupt, Kill)
-	<- sc
+	<-sc
 }

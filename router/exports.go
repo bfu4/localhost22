@@ -15,8 +15,16 @@ func GetRoutes(site structs.Site) []structs.Route {
 	content := routes.Content(site.Url)
 	file := routes.File(site.Url)
 	remove := routes.Remove(site)
+	login := routes.Login(site)
 
-	return []structs.Route{root, upload, content, file, remove}
+	return []structs.Route{
+		root,
+		upload,
+		content,
+		file,
+		remove,
+		login,
+	}
 }
 
 func SetupRoutes(router Router, site structs.Site) {
@@ -33,12 +41,6 @@ func SetupRoutes(router Router, site structs.Site) {
 		}
 	}
 
-	jwtSecret, exists := os.LookupEnv("JWT_SECRET")
-
-	if !exists {
-		util.Fatal("No JWT_SECRET environment variable found.")
-	}
-
 	for _, route := range _routes {
 
 		// note from Ali – Learning golang
@@ -47,11 +49,25 @@ func SetupRoutes(router Router, site structs.Site) {
 		route := route
 
 		router.Handle(route.Endpoint, func(writer http.ResponseWriter, request *http.Request) {
-			if route.Authenticated {
-				auth := request.Header.Get("Authorization")
+			if len(route.Methods) > 0 {
+				allowed := util.Contains(route.Methods, request.Method)
 
-				token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
-					return []byte(jwtSecret), nil
+				if !allowed {
+					writer.WriteHeader(405)
+					return
+				}
+			}
+
+			if route.Authenticated {
+				cookie, err := request.Cookie("token")
+
+				if err != nil {
+					writer.WriteHeader(403)
+					return
+				}
+
+				token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
+					return util.GetJWTSecret(), nil
 				})
 
 				if err != nil || !token.Valid {

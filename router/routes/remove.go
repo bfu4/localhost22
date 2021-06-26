@@ -3,6 +3,7 @@ package routes
 import (
 	"cdn/db"
 	cdnFile "cdn/file"
+	"cdn/router/functions"
 	"cdn/structs"
 	"cdn/util"
 	"net/http"
@@ -20,33 +21,24 @@ func Remove(site structs.Site) structs.Route {
 
 	return structs.Route{
 		Endpoint: point,
+		Methods:  []string{"POST"},
 		Callback: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("Access-Control-Allow-Origin", "*")
 
-			// Check for post request
-			if r.Method != "POST" {
-				w.WriteHeader(405)
-				return
-			}
-
-			_ = r.ParseMultipartForm(32 << 20) // 32 MB, default
+			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
 
 			allowedUsername, _ := os.LookupEnv("ADMIN")
 			allowedPassword, _ := os.LookupEnv("ADMIN_PASSWORD")
 
 			if r.FormValue("user") != allowedUsername || r.PostForm.Get("password") != allowedPassword {
-				w.Header().Add("Content-Type", "application/json")
-				w.WriteHeader(400)
-				_, _ = w.Write([]byte(util.Stringify(util.JsonObject{Key: "error", Value: "invalid password"})))
+				functions.SendError("invalid password", 400, w)
 				return
 			}
 
 			file := r.FormValue("file")
 
 			if file == "" {
-				w.WriteHeader(400)
-				w.Header().Add("Content-Type", "application/json")
-				_, _ = w.Write([]byte(util.Stringify(util.JsonObject{Key: "error", Value: "missing a file to remove"})))
+				functions.SendError("missing a file to remove!", 400, w)
 				return
 			}
 

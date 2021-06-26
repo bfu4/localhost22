@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"cdn/db"
 	cdnFile "cdn/file"
+	"cdn/router/functions"
 	"cdn/structs"
 	"cdn/util"
 	"io"
@@ -24,21 +25,15 @@ func Upload(site structs.Site) structs.Route {
 	return structs.Route{
 		Endpoint:      point,
 		Authenticated: true,
+		Methods:       []string{"POST"},
 		Callback: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("Access-Control-Allow-Origin", "*")
 
-			// Check for post request
-			if r.Method != "POST" {
-				w.WriteHeader(405)
-				return
-			}
-
-			_ = r.ParseMultipartForm(32 << 20) // 32 MB, default
+			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
 
 			file, handler, err := r.FormFile("file")
 			if err != nil {
-				util.Info(err.Error())
-				w.WriteHeader(400)
+				functions.SendError(err.Error(), 400, w)
 				return
 			}
 
@@ -48,8 +43,7 @@ func Upload(site structs.Site) structs.Route {
 
 			// If it fails, return internal server error
 			if err != nil {
-				print(err.Error())
-				w.WriteHeader(500)
+				functions.SendError(err.Error(), 500, w)
 				return
 			}
 
