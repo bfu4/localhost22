@@ -14,6 +14,7 @@ import (
 
 func main() {
 	_ = godotenv.Load()
+
 	site, _ := LookupEnv("CDN_SITE_URL")
 	sitePort, _ := LookupEnv("CDN_SITE_PORT")
 	dbName, _ := LookupEnv("CDN_DATABASE")

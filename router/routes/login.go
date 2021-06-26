@@ -79,7 +79,12 @@ func Login(site structs.Site) structs.Route {
 			}
 
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-			tokenString, _ := token.SigningString()
+			tokenString, err := token.SignedString(util.GetJWTSecret())
+
+			if err != nil {
+				functions.SendError(err.Error(), 500, w)
+				return
+			}
 
 			cookie := http.Cookie{
 				HttpOnly: true,
@@ -91,6 +96,7 @@ func Login(site structs.Site) structs.Route {
 			}
 
 			w.Header().Set("Set-Cookie", cookie.String())
+			_ = w.Header().Write(w)
 
 			_, _ = w.Write([]byte("OK"))
 		},
