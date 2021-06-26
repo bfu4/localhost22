@@ -7,7 +7,6 @@ import (
 	"cdn/structs"
 	"cdn/util"
 	"net/http"
-	"os"
 )
 
 // Remove the remove route
@@ -20,20 +19,11 @@ func Remove(site structs.Site) structs.Route {
 	}
 
 	return structs.Route{
-		Endpoint: point,
-		Methods:  []string{"POST"},
+		Endpoint:      point,
+		Methods:       []string{"POST"},
+		Authenticated: true,
 		Callback: func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Add("Access-Control-Allow-Origin", "*")
-
 			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
-
-			allowedUsername, _ := os.LookupEnv("ADMIN")
-			allowedPassword, _ := os.LookupEnv("ADMIN_PASSWORD")
-
-			if r.FormValue("user") != allowedUsername || r.PostForm.Get("password") != allowedPassword {
-				functions.SendError("invalid password", 400, w)
-				return
-			}
 
 			file := r.FormValue("file")
 

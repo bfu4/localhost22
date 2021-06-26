@@ -49,6 +49,9 @@ func SetupRoutes(router Router, site structs.Site) {
 		route := route
 
 		router.Handle(route.Endpoint, func(writer http.ResponseWriter, request *http.Request) {
+			writer.Header().Add("Access-Control-Allow-Origin", "http://localhost:3000")
+			writer.Header().Add("Access-Control-Allow-Credentials", "true")
+
 			if len(route.Methods) > 0 {
 				allowed := util.Contains(route.Methods, request.Method)
 

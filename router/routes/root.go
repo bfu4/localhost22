@@ -17,7 +17,6 @@ func Root(hostUrl string) structs.Route {
 		Endpoint: point,
 		Callback: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("content-type", "application/json")
-			w.Header().Add("Access-Control-Allow-Origin", "*")
 			w.WriteHeader(200)
 			_, _ = w.Write(getRootData())
 		},

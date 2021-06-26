@@ -18,7 +18,6 @@ func File(hostUrl string) structs.Route {
 	return structs.Route{
 		Endpoint: point,
 		Callback: func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Add("Access-Control-Allow-Origin", "*")
 			query := r.URL.Query()
 			fileName, present := query["name"]
 
