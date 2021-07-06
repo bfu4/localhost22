@@ -6,11 +6,9 @@ import (
 	"cdn/router/functions"
 	"cdn/structs"
 	"cdn/util"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/matthewhartstonge/argon2"
 	"net/http"
 	"strings"
-	"time"
 )
 
 func Login(site structs.Site) structs.Route {
@@ -69,20 +67,18 @@ func Login(site structs.Site) structs.Route {
 				return
 			}
 
-			expirationTime := time.Now().Add(time.Hour * 24 * 7)
-
-			claims := structs.Claims{
-				StandardClaims: jwt.StandardClaims{
-					ExpiresAt: expirationTime.Unix(),
-				},
-				UserId: user.Id,
-			}
-
-			token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-			tokenString, err := token.SignedString(util.GetJWTSecret())
-
 			if err != nil {
 				functions.SendError(err.Error(), 500, w)
+				return
+			}
+
+			jwtWrapper := util.GetJWTWrapper()
+
+			expiry := jwtWrapper.GetExpiry()
+			tokenString, err := jwtWrapper.GenerateToken(user.Id, expiry)
+
+			if err != nil {
+				functions.SendError(err.Error(), 403, w)
 				return
 			}
 
@@ -91,7 +87,7 @@ func Login(site structs.Site) structs.Route {
 				SameSite: http.SameSiteLaxMode,
 				Secure:   !strings.Contains(site.Url, "localhost"),
 				Path:     "/",
-				Expires:  expirationTime,
+				Expires:  expiry,
 				Value:    tokenString,
 				Name:     "token",
 			}
