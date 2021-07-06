@@ -22,7 +22,7 @@ func Remove(site structs.Site) structs.Route {
 		Endpoint:      point,
 		Methods:       []string{"POST"},
 		Authenticated: true,
-		Callback: func(w http.ResponseWriter, r *http.Request) {
+		Callback: func(w http.ResponseWriter, r *http.Request, userId int) {
 			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
 
 			file := r.FormValue("file")

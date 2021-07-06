@@ -1,10 +1,8 @@
 package util
 
 type JsonObject struct {
-
-	Key string
+	Key   string
 	Value string
-
 }
 
 func Stringify(objects ...JsonObject) string {

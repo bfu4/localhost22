@@ -23,7 +23,7 @@ func Login(site structs.Site) structs.Route {
 		Endpoint:      endpoint,
 		Authenticated: false,
 		Methods:       []string{"POST"},
-		Callback: func(w http.ResponseWriter, r *http.Request) {
+		Callback: func(w http.ResponseWriter, r *http.Request, userId int) {
 			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
 
 			username := r.FormValue("username")

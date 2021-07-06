@@ -17,7 +17,7 @@ func File(hostUrl string) structs.Route {
 
 	return structs.Route{
 		Endpoint: point,
-		Callback: func(w http.ResponseWriter, r *http.Request) {
+		Callback: func(w http.ResponseWriter, r *http.Request, userId int) {
 			query := r.URL.Query()
 			fileName, present := query["name"]
 

@@ -26,7 +26,7 @@ func Upload(site structs.Site) structs.Route {
 		Endpoint:      point,
 		Authenticated: true,
 		Methods:       []string{"POST"},
-		Callback: func(w http.ResponseWriter, r *http.Request) {
+		Callback: func(w http.ResponseWriter, r *http.Request, userId int) {
 			_ = r.ParseMultipartForm(util.DefaultFormMaxMem)
 
 			file, handler, err := r.FormFile("file")
