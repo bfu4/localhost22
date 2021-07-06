@@ -47,4 +47,3 @@ func (router Router) Put(endpoint structs.Endpoint, function http.HandlerFunc) {
 func (router Router) Handle(endpoint structs.Endpoint, function http.HandlerFunc) {
 	router.Router.Handle(endpoint.Name, function)
 }
-

@@ -64,14 +64,17 @@ func SetupRoutes(router Router, site structs.Site) {
 			}
 
 			if route.Authenticated {
-				id, err := functions.ParseJWT(request)
+				cookie := request.Header.Get("cookie")
+
+				wrapper := util.GetJWTWrapper()
+				result, err := wrapper.ValidateToken(cookie)
 
 				if err != nil {
 					functions.SendError("You are not signed in", 401, writer)
 					return
 				}
 
-				route.Callback(writer, request, id)
+				route.Callback(writer, request, result.UserId)
 				return
 			}
 

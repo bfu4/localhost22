@@ -1,6 +1,7 @@
 package util
 
 import (
+	"cdn/router/functions"
 	"errors"
 	"os"
 )
@@ -16,8 +17,14 @@ func GetEnvironment(key string) string {
 	return value
 }
 
-func GetJWTSecret() []byte {
-	return []byte(GetEnvironment("JWT_SECRET"))
+func GetJWTWrapper() functions.JwtWrapper {
+	key := []byte(GetEnvironment("JWT_SECRET"))
+
+	return functions.JwtWrapper{
+		SecretKey:       key,
+		Issuer:          "localhost22",
+		ExpirationHours: 24 * 7,
+	}
 }
 
 // DefaultFormMaxMem 32 MB, default
