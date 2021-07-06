@@ -1,10 +1,10 @@
 package router
 
 import (
+	"cdn/router/functions"
 	"cdn/router/routes"
 	"cdn/structs"
 	"cdn/util"
-	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"os"
 )
@@ -16,6 +16,7 @@ func GetRoutes(site structs.Site) []structs.Route {
 	file := routes.File(site.Url)
 	remove := routes.Remove(site)
 	login := routes.Login(site)
+	me := routes.Me(site)
 
 	return []structs.Route{
 		root,
@@ -24,6 +25,7 @@ func GetRoutes(site structs.Site) []structs.Route {
 		file,
 		remove,
 		login,
+		me,
 	}
 }
 
@@ -62,24 +64,18 @@ func SetupRoutes(router Router, site structs.Site) {
 			}
 
 			if route.Authenticated {
-				cookie, err := request.Cookie("token")
+				id, err := functions.ParseJWT(request)
 
 				if err != nil {
-					writer.WriteHeader(403)
+					functions.SendError("You are not signed in", 401, writer)
 					return
 				}
 
-				token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
-					return util.GetJWTSecret(), nil
-				})
-
-				if err != nil || !token.Valid {
-					writer.WriteHeader(403)
-					return
-				}
+				route.Callback(writer, request, id)
+				return
 			}
 
-			route.Callback(writer, request)
+			route.Callback(writer, request, -1)
 		})
 	}
 }
