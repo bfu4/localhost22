@@ -14,7 +14,7 @@ func SendError(err string, code int, w http.ResponseWriter) {
 
 	w.WriteHeader(code)
 
-	pe := printableError{Message: err}
+	pe := printableError{err}
 	data, _ := json.Marshal(pe)
 	_, _ = w.Write(data)
 }

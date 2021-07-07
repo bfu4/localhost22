@@ -3,7 +3,7 @@ package routes
 import (
 	"cdn/db"
 	"cdn/structs"
-	"cdn/util"
+	"cdn/structs/models"
 	"encoding/json"
 	"net/http"
 )
@@ -18,7 +18,7 @@ func Content(hostUrl string) structs.Route {
 	return structs.Route{
 		Endpoint: point,
 		Callback: func(w http.ResponseWriter, r *http.Request, userId int) {
-			w.Header().Add("content-type", "application/json")
+			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(200)
 			_, _ = w.Write([]byte(getAllContent()))
 		},
@@ -27,31 +27,11 @@ func Content(hostUrl string) structs.Route {
 
 func getAllContent() string {
 	database := db.GetGlobalDatabase()
-	rows, err := database.DB.Query("select * from uploaded;")
 
-	if err != nil {
-		return util.Stringify(util.JsonObject{Key: "values", Value: "none"})
-	}
+	var contents []models.User
+	database.Find(&contents)
 
-	var sites = make(map[string][]structs.DatabaseEntry)
-	var curr string
-
-	for rows.Next() {
-		entry := structs.DatabaseEntry{}
-		_ = rows.Scan(&entry.OriginalName, &entry.FileName, &entry.FileExtension, &entry.Site)
-
-		if curr != entry.Site {
-			curr = entry.Site
-		}
-
-		sites[curr] = append(sites[curr], entry)
-	}
-
-	ret, err := json.Marshal(sites)
-
-	if err != nil {
-		return util.Stringify(util.JsonObject{Key: "values", Value: "unreadable"})
-	}
+	ret, _ := json.Marshal(contents)
 
 	return string(ret)
 }

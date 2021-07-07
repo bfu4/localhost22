@@ -4,6 +4,7 @@ import (
 	"cdn/db"
 	"cdn/router/functions"
 	"cdn/structs"
+	"cdn/structs/models"
 	"encoding/json"
 	"net/http"
 )
@@ -27,23 +28,20 @@ func Me(site structs.Site) structs.Route {
 		Callback: func(w http.ResponseWriter, r *http.Request, userId int) {
 			database := db.GetGlobalDatabase()
 
-			scan, _ := database.DB.Query("SELECT * FROM users WHERE id = ?", userId)
+			var user models.User
+			result := database.Take(&user, "id = ?", userId)
 
-			var user structs.User
-			err := scan.Scan(&user)
-
-			if err != nil {
-				functions.SendError(err.Error(), 500, w)
+			if result.Error != nil {
+				functions.SendError(result.Error.Error(), 500, w)
 				return
 			}
 
-			reply := Reply{
+			body, _ := json.Marshal(Reply{
 				UserId:   user.Id,
 				Username: user.Username,
 				Admin:    user.Admin,
-			}
+			})
 
-			body, _ := json.Marshal(reply)
 			_, _ = w.Write(body)
 		},
 	}

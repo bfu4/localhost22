@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"cdn/auth"
 	"cdn/db"
 	"cdn/router/functions"
 	"cdn/structs"
+	"cdn/structs/models"
 	"cdn/util"
 	"github.com/matthewhartstonge/argon2"
 	"net/http"
@@ -34,28 +34,11 @@ func Login(site structs.Site) structs.Route {
 
 			database := db.GetGlobalDatabase()
 
-			rows, err := database.DB.Query(
-				"SELECT id, password FROM users WHERE username = ?",
-				username,
-			)
+			var user models.User
+			result := database.First(&user, "username = ?", username)
 
-			if rows == nil {
-				message := util.ErrorOrMessage(err, "Something went wrong.")
-				functions.SendError(message, 500, w)
-				return
-			}
-
-			user := auth.Credentials{}
-
-			if !rows.Next() {
+			if result.Error != nil {
 				functions.SendError("User not found", 404, w)
-				return
-			}
-
-			err = rows.Scan(&user.Id, &user.Password)
-
-			if err != nil {
-				functions.SendError(err.Error(), 500, w)
 				return
 			}
 
