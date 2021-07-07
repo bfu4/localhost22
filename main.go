@@ -18,13 +18,8 @@ func main() {
 
 	site, _ := LookupEnv("CDN_SITE_URL")
 	sitePort, _ := LookupEnv("CDN_SITE_PORT")
-	dbName, _ := LookupEnv("CDN_DATABASE")
-	user, _ := LookupEnv("CDN_DATABASE_USER")
-	pass, _ := LookupEnv("CDN_DATABASE_USER_PASSWORD")
-	url, _ := LookupEnv("CDN_DATABASE_HOST")
 
 	util.InitLogger("CDN")
-	db.InitSql()
 
 	router := Router{
 		Router: chi.NewRouter(),
@@ -39,14 +34,7 @@ func main() {
 
 	SetupRoutes(router, mainSite)
 
-	database := db.OpenDatabase(
-		url,
-		dbName,
-		user,
-		pass,
-	)
-
-	db.SetGlobalDatabase(database)
+	db.OpenDatabase()
 
 	// Start the server
 	util.Info("Starting server on port {}!", sitePort)

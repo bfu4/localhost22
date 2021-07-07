@@ -29,3 +29,7 @@ func GetJWTWrapper() functions.JwtWrapper {
 
 // DefaultFormMaxMem 32 MB, default
 var DefaultFormMaxMem int64 = 32 << 20
+
+func GetDatabaseURL() string {
+	return GetEnvironment("DATABASE_URL")
+}
