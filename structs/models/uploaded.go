@@ -9,4 +9,6 @@ type Uploaded struct {
 	Extension    string
 	Site         string
 	Id           int `gorm:"primaryKey;autoIncrement:true"`
+	Uploader     User
+	UploaderID   int
 }

@@ -2,9 +2,9 @@ package routes
 
 import (
 	"cdn/db"
-	cdnFile "cdn/file"
 	"cdn/router/functions"
 	"cdn/structs"
+	"cdn/structs/models"
 	"cdn/util"
 	"net/http"
 )
@@ -32,11 +32,19 @@ func Remove(site structs.Site) structs.Route {
 				return
 			}
 
-			// Write the file into the byte buffer
+			database := db.GetGlobalDatabase()
 
-			// Write file into uploaded content folder
+			var resolvedFile models.Uploaded
+			result := database.Take(&resolvedFile, "id = ?", file)
+
+			if result.Error != nil {
+				functions.SendError(result.Error.Error(), 500, w)
+				return
+			}
+
+			database.Delete(&models.Uploaded{}, file)
+
 			w.WriteHeader(200)
-			cdnFile.Remove(file, site, db.GetGlobalDatabase())
 		},
 	}
 }

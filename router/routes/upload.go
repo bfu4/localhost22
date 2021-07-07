@@ -6,10 +6,12 @@ import (
 	cdnFile "cdn/file"
 	"cdn/router/functions"
 	"cdn/structs"
+	"cdn/structs/models"
 	"cdn/util"
 	"io"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -34,6 +36,8 @@ func Upload(site structs.Site) structs.Route {
 				functions.SendError(err.Error(), 400, w)
 				return
 			}
+
+			database := db.GetGlobalDatabase()
 
 			// Write the file into the byte buffer
 			bz := bytes.NewBuffer(nil)
@@ -65,14 +69,40 @@ func Upload(site structs.Site) structs.Route {
 				Contents:  bz.Bytes(),
 			}
 
-			// Write file into uploaded content folder
-			randomFile := cdnFile.Upload(uploadFile, db.GetGlobalDatabase(), site)
+			newFileName := cdnFile.GenerateFileName(uploadFile)
+
+			fileName := newFileName.Name + uploadFile.Extension
+			err = os.WriteFile(
+				util.Format("{}/content/{}", site.RelativeLocation, fileName),
+				uploadFile.Contents,
+				0755,
+			)
+
+			if err != nil {
+				msg := err.Error()
+				util.Info("Failed to create file [{}] because of {}!", fileName, msg)
+				functions.SendError(msg, 500, w)
+				return
+			}
+
+			uploaded := models.Uploaded{
+				OriginalName: uploadFile.Name,
+				Name:         newFileName.Name,
+				Extension:    uploadFile.Extension,
+				Site:         site.Name,
+				UploaderID:   userId,
+			}
+
+			database.Create(&uploaded)
+
 			w.WriteHeader(200)
 
-			_, _ = w.Write([]byte(util.Stringify(util.JsonObject{
-				Key:   "file",
-				Value: randomFile.Name + extension,
-			})))
+			_, _ = w.Write([]byte(util.Stringify(
+				util.JsonObject{
+					Key:   "file",
+					Value: newFileName.Name + extension,
+				}),
+			))
 
 			defer func(file multipart.File) {
 				_ = file.Close()
