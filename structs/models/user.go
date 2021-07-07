@@ -7,5 +7,5 @@ type User struct {
 	Username string
 	Password string
 	Admin    bool
-	Id       int `gorm:"primaryKey;autoIncrement:true"`
+	Id       int
 }
