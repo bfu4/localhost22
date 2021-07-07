@@ -3,15 +3,19 @@ version: "3.8"
 services:
   db:
     image: mysql
+    restart: always
     ports:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: mysql
-      MYSQL_USER: mysql
       MYSQL_DATABASE: mysql
+      MYSQL_USER: mysql
       MYSQL_PASSWORD: mysql
 
   app:
+    restart: always
+    depends_on:
+      - db
     build:
       context: .
       dockerfile: Dockerfile
